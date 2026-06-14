@@ -2,13 +2,10 @@ package com.abhishekvermaa10.entity;
 
 import com.abhishekvermaa10.enums.Gender;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +34,6 @@ public class Owner extends Base {
 	private String mobileNumber;
 	@Column(name = "email_id", nullable = false, unique = true)
 	private String emailId;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
-	@JoinColumn(name = "pet_id", referencedColumnName = "id", nullable = false, unique = true)
-	private Pet pet;
-
+	@Column(name = "pet_id", nullable = false, unique = true)
+	private Integer petId;
 }

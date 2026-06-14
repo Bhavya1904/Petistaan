@@ -1,7 +1,13 @@
 package com.abhishekvermaa10.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.abhishekvermaa10.dto.PetDTO;
+import com.abhishekvermaa10.entity.Pet;
+import com.abhishekvermaa10.exception.PetNotFoundException;
+import com.abhishekvermaa10.util.PetMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.abhishekvermaa10.dto.PetCategoryStatisticsDTO;
@@ -22,6 +28,9 @@ import lombok.RequiredArgsConstructor;
 public class PetServiceImpl implements PetService {
 
 	private final PetRepository petRepository;
+	private final PetMapper petMapper;
+	@Value("${pet.not.found}")
+	private String petNotFound;
 
 	@Override
 	public PetStatisticsDTO getStatistics() {
@@ -40,6 +49,40 @@ public class PetServiceImpl implements PetService {
 			petGenderStatisticsDTO.mergeOrCreateType(type, count);
 		}
 		return petStatisticsDTO;
+	}
+
+	@Override
+	public Integer savePet(PetDTO petDTO) {
+		Pet pet = petMapper.petDTOToPet(petDTO);
+		petRepository.save(pet);
+		return pet.getId();
+	}
+
+	@Override
+	public PetDTO findPet(Integer petId) throws PetNotFoundException {
+		PetDTO petDTO = petRepository.findById(petId)
+				.map(petMapper :: petToPetDTO)
+				.orElseThrow(() -> new PetNotFoundException(String.format(petNotFound, petId)));
+		return petDTO;
+	}
+
+	@Override
+	public void updatePet(Integer petId, String petName) throws PetNotFoundException{
+		Pet pet = petRepository.findById(petId).orElseThrow(()
+				-> new PetNotFoundException(
+						String.format(petNotFound, petId)
+		));
+		pet.setName(petName);
+		petRepository.save(pet);
+	}
+
+	@Override
+	public void deletePet(Integer petId) throws PetNotFoundException{
+		boolean petExists = petRepository.existsById(petId);
+		if(!petExists) {
+			throw new PetNotFoundException(String.format(petNotFound, petId));
+		}
+		petRepository.deleteById(petId);
 	}
 
 }

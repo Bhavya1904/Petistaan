@@ -2,6 +2,7 @@ package com.abhishekvermaa10.controller.advice;
 
 import java.time.LocalDateTime;
 
+import com.abhishekvermaa10.exception.PetNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -15,6 +16,13 @@ import com.abhishekvermaa10.dto.ErrorDTO;
  */
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
+
+	@ExceptionHandler
+	public ResponseEntity<ErrorDTO> handleNotFoundException(PetNotFoundException exception) {
+		ErrorDTO errorDTO = new ErrorDTO(exception.getMessage(), HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(),
+				LocalDateTime.now());
+		return ResponseEntity.status(errorDTO.status()).body(errorDTO);
+	}
 	
 	@ExceptionHandler
 	public ResponseEntity<ErrorDTO> handleMethodNotAllowedException(HttpRequestMethodNotSupportedException exception) {
